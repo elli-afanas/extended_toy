@@ -10,9 +10,10 @@ def double_print(x) {
 def main() {
   var first<2, 3> = [1, 2, 3, 4, 5, 6];
   var second<2, 3> = [1, 2, 3, 4, 5, 6];
-  print(first);
 
   var trans<3, 2> = transpose(first);
+
+  mat_add(first, second);
 
   print(trans);
 }

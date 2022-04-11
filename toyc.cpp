@@ -258,8 +258,7 @@ int runJit(mlir::ModuleOp module) {
 }
 
 int main(int argc, char **argv) {
-  std::cout << "(!) modified toy (!)" << std::endl;
-  fflush(stdout);
+  std::cout << "(!!) modified toy (!!)" << std::endl;
 
   // Register any command line options.
   mlir::registerAsmPrinterCLOptions();
