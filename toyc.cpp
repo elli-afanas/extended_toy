@@ -39,7 +39,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
-//#include "recursive_print.h"
+#include "mlir/recursive_print.h"
 
 using namespace toy;
 namespace cl = llvm::cl;
@@ -134,11 +134,11 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (int error = loadMLIR(context, module))
     return error;
 
-  //printOperatio(&module);
+  std::cout << "going to do print pass" << std::endl;
+
 
   mlir::PassManager pm(&context);
   // Apply any generic pass manager command line options and run the pipeline.
-  applyPassManagerCLOptions(pm);
 
   // Check to see what granularity of MLIR we are compiling to.
   bool isLoweringToAffine = emitAction >= Action::DumpMLIRAffine;

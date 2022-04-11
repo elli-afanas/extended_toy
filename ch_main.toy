@@ -1,11 +1,12 @@
 def main() {
   var first<2, 3> = [1, 2, 3, 4, 5, 6];
-  var second<2, 3> = [1, 2, 3, 4, 5, 6];
+  var second<2, 3> = [8, 2, 1, 2, 4, 2];
 
-  var trans<3, 2> = transpose(first);
+  # var res = mat_add(first, second);
 
-  mat_add(first, second);
+  var res2 = mat_add(transpose(first), transpose(second));
 
-  print(trans);
+  #print(res);
+  print(res2);
 }
 

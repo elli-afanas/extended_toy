@@ -433,22 +433,22 @@ void MatAddOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
 mlir::LogicalResult MatAddOp::verify()
 {
   std::cout << "CALLED MatAddOp::verify()" << std::endl;
-  auto lhsType = getOperand(0).getType().dyn_cast<RankedTensorType>();
-  auto rhsType = getOperand(1).getType().dyn_cast<RankedTensorType>();
+  auto lhsType = getLhs().getType().dyn_cast<RankedTensorType>();
+  auto rhsType = getRhs().getType().dyn_cast<RankedTensorType>();
 
-  auto resultType = getType().dyn_cast<RankedTensorType>();
+  auto resultType= getType().dyn_cast<RankedTensorType>();
+
+  std::cout << "shape of output: " << this->getType().hasStaticShape() << std::endl;
 
   if (!lhsType)
   {
     std::cout << "empty lhs type in matAdd" << std::endl;
-    std::cout << typeid(getOperand(0).getType()).name() << std::endl;
     return mlir::success();
   }
 
   if (!rhsType)
   {
     std::cout << "empty rhs type in matAdd" << std::endl;
-    std::cout << typeid(getOperand(1).getType()).name() << std::endl;
     return mlir::success();
   }
 
@@ -477,6 +477,9 @@ mlir::LogicalResult MatAddOp::verify()
 
   return mlir::success();
 }
+
+//getResult().setType(getOperand(0).getType());
+void MatAddOp::inferShapes() { this->getResult().setType(this->getLhs().getType()); }
 
 //===----------------------------------------------------------------------===//
 // TableGen'd op method definitions
