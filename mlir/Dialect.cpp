@@ -11,6 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <iostream>
 #include "toy/Dialect.h"
 
 #include "mlir/IR/Builders.h"
@@ -415,6 +416,65 @@ mlir::LogicalResult TransposeOp::verify() {
     return emitError()
            << "expected result shape to be a transpose of the input";
   }
+  return mlir::success();
+}
+
+
+//===----------------------------------------------------------------------===//
+// MatAddOp
+//===----------------------------------------------------------------------===//
+
+void MatAddOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                     mlir::Value lhs, mlir::Value rhs) {
+  state.addTypes(UnrankedTensorType::get(builder.getF64Type()));
+  state.addOperands({lhs, rhs});
+}
+
+mlir::LogicalResult MatAddOp::verify()
+{
+  std::cout << "CALLED MatAddOp::verify()" << std::endl;
+  auto lhsType = getOperand(0).getType().dyn_cast<RankedTensorType>();
+  auto rhsType = getOperand(1).getType().dyn_cast<RankedTensorType>();
+
+  auto resultType = getType().dyn_cast<RankedTensorType>();
+
+  if (!lhsType)
+  {
+    std::cout << "empty lhs type in matAdd" << std::endl;
+    std::cout << typeid(getOperand(0).getType()).name() << std::endl;
+    return mlir::success();
+  }
+
+  if (!rhsType)
+  {
+    std::cout << "empty rhs type in matAdd" << std::endl;
+    std::cout << typeid(getOperand(1).getType()).name() << std::endl;
+    return mlir::success();
+  }
+
+  auto lhsShape = lhsType.getShape();
+  auto rhsShape = rhsType.getShape();
+
+  if(lhsShape.size() != 2 || rhsShape.size() != 2)
+  {
+    return emitError()
+        << "input tensors should be matricies (have dim = 2), while they are " << lhsShape.size() << " and " << rhsShape.size();
+  }
+
+  if(lhsShape.size() != 2 || rhsShape.size() != 2)
+  {
+    return emitError()
+        << "input tensors should be matricies (have dim = 2), while they are " << lhsShape.size() << " and " << rhsShape.size();
+  }
+
+  int pos = 0;
+  for (auto [lhs_elem, rhs_elem] : zip(lhsShape, rhsShape)) {
+    if(lhs_elem != rhs_elem)
+      return emitError()
+          << "dimensions of input matricies should match, while mismatch " << int(lhs_elem) << " vs " << int(rhs_elem) << " at " << pos << " position";
+    pos++;
+  }
+
   return mlir::success();
 }
 

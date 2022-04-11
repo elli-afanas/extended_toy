@@ -323,6 +323,15 @@ private:
       return builder.create<TransposeOp>(location, operands[0]);
     }
 
+    if (callee == "mat_add") {
+      if (call.getArgs().size() != 2) {
+        emitError(location, "MLIR codegen encountered an error: toy.mat_Add "
+                            "should accept 2 arguments");
+        return nullptr;
+      }
+      return builder.create<MatAddOp>(location, operands[0], operands[1]);
+    }
+
     // Otherwise this is a call to a user-defined function. Calls to
     // user-defined functions are mapped to a custom call that takes the callee
     // name as an attribute.
@@ -358,6 +367,8 @@ private:
       return mlirGen(cast<CallExprAST>(expr));
     case toy::ExprAST::Expr_Num:
       return mlirGen(cast<NumberExprAST>(expr));
+    case toy::ExprAST::Expr_MatAdd:
+      return mlirGen(cast<MatAddExprAST>(expr));
     default:
       emitError(loc(expr.loc()))
           << "MLIR codegen encountered an unhandled expr kind '"
@@ -421,6 +432,15 @@ private:
         return mlir::failure();
     }
     return mlir::success();
+  }
+
+  mlir::Value mlirGen(MatAddExprAST &call) {
+    auto lhs = mlirGen(*call.getLHS());
+    auto rhs = mlirGen(*call.getRHS());
+    if (!lhs || !rhs)
+      return nullptr;
+
+    return builder.create<MatAddOp>(loc(call.loc()), lhs, rhs);
   }
 
   /// Build a tensor type from a list of shape dimensions.

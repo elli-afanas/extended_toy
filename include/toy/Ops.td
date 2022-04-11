@@ -366,4 +366,37 @@ def TransposeOp : Toy_Op<"transpose",
   let hasVerifier = 1;
 }
 
+
+
+//===----------------------------------------------------------------------===//
+// MatAddOp
+//===----------------------------------------------------------------------===//
+
+def MatAddOp : Toy_Op<"mat_add"> {
+  let summary = "mat_add operation";
+  let description = [{
+  well it adds two matricies (in tensor format). returns a matrix of the same size
+  }];
+
+  let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+  let results = (outs F64Tensor);
+
+  // Indicate that the operation has a custom parser and printer method.
+  //let hasCustomAssemblyFormat = 1;
+  // this is instead of C++-defined custom parser and printer
+  let assemblyFormat = [{
+  `(` $lhs `:` type($lhs) $rhs `:` type($rhs) `)` attr-dict `to` type(results)
+  }];
+
+  // Allow building an MatAddOp with from the two input operands.
+  let builders = [
+  OpBuilder<(ins "::mlir::Value":$lhs, "::mlir::Value":$rhs)>
+  ];
+
+  //let hasCanonicalizer = 1;
+
+  let hasVerifier = 1;
+}
+
+
 #endif // TOY_OPS
