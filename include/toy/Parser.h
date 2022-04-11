@@ -207,7 +207,14 @@ private:
       return std::make_unique<PrintExprAST>(std::move(loc), std::move(args[0]));
     }
 
-    // Call to a user-defined function
+    if (name == "mat_add") {
+      if (args.size() != 2)
+        return parseError<ExprAST>("<two args>", "as argument to mat_add()");
+      return std::make_unique<MatAddExprAST>(std::move(loc), std::move(args[0]), std::move(args[1]));
+    }
+
+
+      // Call to a user-defined function
     return std::make_unique<CallExprAST>(std::move(loc), name, std::move(args));
   }
 

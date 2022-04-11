@@ -48,6 +48,7 @@ private:
   void dump(PrintExprAST *node);
   void dump(PrototypeAST *node);
   void dump(FunctionAST *node);
+  void dump(MatAddExprAST *node);
 
   // Actually print spaces matching the current indentation level
   void indent() {
@@ -77,7 +78,7 @@ template <typename T> static std::string loc(T *node) {
 void ASTDumper::dump(ExprAST *expr) {
   llvm::TypeSwitch<ExprAST *>(expr)
       .Case<BinaryExprAST, CallExprAST, LiteralExprAST, NumberExprAST,
-            PrintExprAST, ReturnExprAST, VarDeclExprAST, VariableExprAST>(
+            PrintExprAST, MatAddExprAST, ReturnExprAST, VarDeclExprAST, VariableExprAST>(
           [&](auto *node) { this->dump(node); })
       .Default([&](ExprAST *) {
         // No match, fallback to a generic message
@@ -223,6 +224,15 @@ void ASTDumper::dump(ModuleAST *node) {
   llvm::errs() << "Module:\n";
   for (auto &f : *node)
     dump(&f);
+}
+
+void ASTDumper::dump(MatAddExprAST *node) {
+  INDENT();
+  llvm::errs() << "mat_add [ " << loc(node) << "\n";
+  dump(node->getLHS());
+  dump(node->getRHS());
+  indent();
+  llvm::errs() << "]\n";
 }
 
 namespace toy {

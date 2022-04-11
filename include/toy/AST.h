@@ -42,6 +42,7 @@ public:
     Expr_BinOp,
     Expr_Call,
     Expr_Print,
+    Expr_MatAdd
   };
 
   ExprAST(ExprASTKind kind, Location location)
@@ -236,6 +237,22 @@ public:
 
   auto begin() -> decltype(functions.begin()) { return functions.begin(); }
   auto end() -> decltype(functions.end()) { return functions.end(); }
+};
+
+/// Expression class for novel MatAdd operation
+class MatAddExprAST : public ExprAST {
+    std::unique_ptr<ExprAST> m_lhs;
+    std::unique_ptr<ExprAST> m_rhs;
+
+public:
+    MatAddExprAST(Location loc, std::unique_ptr<ExprAST> lhs, std::unique_ptr<ExprAST> rhs)
+            : ExprAST(Expr_MatAdd, std::move(loc)), m_lhs(std::move(lhs)), m_rhs(std::move(rhs)) {}
+
+    ExprAST *getLHS() { return m_lhs.get(); }
+    ExprAST *getRHS() { return m_rhs.get(); }
+
+    /// LLVM style RTTI
+    static bool classof(const ExprAST *c) { return c->getKind() == Expr_MatAdd; }
 };
 
 void dump(ModuleAST &);
