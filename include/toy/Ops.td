@@ -393,7 +393,7 @@ def MatAddOp : Toy_Op<"mat_add", [NoSideEffect, DeclareOpInterfaceMethods<ShapeI
   OpBuilder<(ins "::mlir::Value":$lhs, "::mlir::Value":$rhs)>
   ];
 
-  //let hasCanonicalizer = 1;
+  let hasCanonicalizer = 1;
 
   let hasVerifier = 1;
 }

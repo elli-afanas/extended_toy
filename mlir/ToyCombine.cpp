@@ -11,6 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <iostream>
 #include "mlir/IR/Matchers.h"
 #include "mlir/IR/PatternMatch.h"
 #include "toy/Dialect.h"
@@ -52,11 +53,45 @@ struct SimplifyRedundantTranspose : public mlir::OpRewritePattern<TransposeOp> {
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+struct SimplifyMatAddAndTranspose : public mlir::OpRewritePattern<MatAddOp> {
+  /// We register this pattern to match every toy.mat_add in the IR.
+  SimplifyMatAddAndTranspose(mlir::MLIRContext *context)
+      : OpRewritePattern<MatAddOp>(context, /*benefit=*/1) {}
+
+  /// This method attempts to match a pattern and rewrite it.
+  mlir::LogicalResult matchAndRewrite(MatAddOp op, mlir::PatternRewriter &rewriter) const override {
+    TransposeOp lhs_def_op = op.getLhs().getDefiningOp<TransposeOp>();
+    TransposeOp rhs_def_op = op.getRhs().getDefiningOp<TransposeOp>();
+
+    if(!rhs_def_op || !lhs_def_op)
+      return failure();
+
+    //std::cout << "match!" << std::endl;
+
+    auto new_mul = rewriter.create<MatAddOp>(op.getLoc(), op.getType(),
+                                           op.getLhs().getDefiningOp<TransposeOp>().getInput(),
+                                           op.getRhs().getDefiningOp<TransposeOp>().getInput());
+
+    rewriter.replaceOpWithNewOp<TransposeOp>(op, op.getType(), new_mul);
+
+    return success();
+  }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /// Register our patterns as "canonicalization" patterns on the TransposeOp so
 /// that they can be picked up by the Canonicalization framework.
 void TransposeOp::getCanonicalizationPatterns(RewritePatternSet &results,
                                               MLIRContext *context) {
   results.add<SimplifyRedundantTranspose>(context);
+}
+
+void MatAddOp::getCanonicalizationPatterns(RewritePatternSet &results,
+                                           MLIRContext *context) {
+  results.add<SimplifyMatAddAndTranspose>(context);
 }
 
 /// Register our patterns as "canonicalization" patterns on the ReshapeOp so
@@ -66,3 +101,4 @@ void ReshapeOp::getCanonicalizationPatterns(RewritePatternSet &results,
   results.add<ReshapeReshapeOptPattern, RedundantReshapeOptPattern,
               FoldConstantReshapeOptPattern>(context);
 }
+
