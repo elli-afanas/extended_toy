@@ -68,8 +68,6 @@ struct SimplifyMatAddAndTranspose : public mlir::OpRewritePattern<MatAddOp> {
     if(!rhs_def_op || !lhs_def_op)
       return failure();
 
-    //std::cout << "match!" << std::endl;
-
     auto new_mul = rewriter.create<MatAddOp>(op.getLoc(), op.getType(),
                                            op.getLhs().getDefiningOp<TransposeOp>().getInput(),
                                            op.getRhs().getDefiningOp<TransposeOp>().getInput());

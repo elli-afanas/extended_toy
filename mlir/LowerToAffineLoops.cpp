@@ -129,6 +129,35 @@ struct BinaryOpLowering : public ConversionPattern {
 using AddOpLowering = BinaryOpLowering<toy::AddOp, arith::AddFOp>;
 using MulOpLowering = BinaryOpLowering<toy::MulOp, arith::MulFOp>;
 
+
+// ---------------------- mat add ------------------------
+
+// no template unlike in binary op, since it is not as generic
+struct MatAddOpLowering : public ConversionPattern {
+  MatAddOpLowering(MLIRContext *ctx)
+      : ConversionPattern(toy::MatAddOp::getOperationName(), 1, ctx) {}
+
+  LogicalResult
+  matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                  ConversionPatternRewriter &rewriter) const final {
+    auto loc = op->getLoc();
+
+    lowerOpToLoops(op, operands, rewriter,
+                   [loc](OpBuilder &builder, ValueRange memRefOperands,
+                         ValueRange loopIvs) {
+                     toy::MatAddOpAdaptor matAddAdaptor(memRefOperands);
+                     Value lhs_inp = matAddAdaptor.getLhs(); // what do we need adaptors for? easy accesses?
+                     Value rhs_inp = matAddAdaptor.getRhs(); //
+
+                     auto load_lhs_op = builder.create<AffineLoadOp>(loc, lhs_inp, loopIvs);
+                     auto load_rhs_op = builder.create<AffineLoadOp>(loc, rhs_inp, loopIvs);
+                     return builder.create<arith::AddFOp>(loc, load_lhs_op, load_rhs_op);
+                     // what happens with store here?
+                   });
+    return success();
+  }
+};
+
 //===----------------------------------------------------------------------===//
 // ToyToAffine RewritePatterns: Constant operations
 //===----------------------------------------------------------------------===//
@@ -347,7 +376,7 @@ void ToyToAffineLoweringPass::runOnOperation() {
   // the set of patterns that will lower the Toy operations.
   RewritePatternSet patterns(&getContext());
   patterns.add<AddOpLowering, ConstantOpLowering, FuncOpLowering, MulOpLowering,
-               PrintOpLowering, ReturnOpLowering, TransposeOpLowering>(
+               PrintOpLowering, ReturnOpLowering, TransposeOpLowering, MatAddOpLowering>(
       &getContext());
 
   // With the target and rewrite patterns defined, we can now attempt the

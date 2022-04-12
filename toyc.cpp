@@ -39,7 +39,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
-#include "mlir/recursive_print.h"
+#include "mlir/DebugPrintPass.h"
 
 using namespace toy;
 namespace cl = llvm::cl;
@@ -134,9 +134,6 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (int error = loadMLIR(context, module))
     return error;
 
-  std::cout << "going to do print pass" << std::endl;
-
-
   mlir::PassManager pm(&context);
   // Apply any generic pass manager command line options and run the pipeline.
 
@@ -145,6 +142,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
 
   if (enableOpt || isLoweringToAffine) {
+    //pm.addPass(mlir::toy::createDebugPrintPass());
+
     // Inline all functions into main and then delete them.
     pm.addPass(mlir::createInlinerPass());
 
@@ -154,6 +153,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     optPM.addPass(mlir::toy::createShapeInferencePass());
     optPM.addPass(mlir::createCanonicalizerPass());
     optPM.addPass(mlir::createCSEPass());
+
+    optPM.addPass(mlir::toy::createDebugPrintPass());
   }
 
   if (isLoweringToAffine) {

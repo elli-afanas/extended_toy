@@ -5,9 +5,9 @@
 
 namespace {
 /// This pass illustrates the IR nesting through printing.
-struct TestPrintNestingPass
-: public mlir::PassWrapper<TestPrintNestingPass, mlir::OperationPass<>> {
-  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(TestPrintNestingPass)
+struct DebugPrintPass
+: public mlir::PassWrapper<DebugPrintPass, mlir::OperationPass<>> {
+  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(DebugPrintPass)
 
   mlir::StringRef getArgument() const final { return "test-print-nesting"; }
   mlir::StringRef getDescription() const final { return "Test various printing."; }
@@ -84,8 +84,7 @@ struct TestPrintNestingPass
 };
 } // namespace
 
-namespace mlir {
-void registerTestPrintNestingPass() {
-  PassRegistration<TestPrintNestingPass>();
+
+std::unique_ptr<mlir::Pass> mlir::toy::createDebugPrintPass() {
+  return std::make_unique<DebugPrintPass>();
 }
-} // namespace mlir
