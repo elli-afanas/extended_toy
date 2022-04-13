@@ -65,6 +65,7 @@ add_toy_deps(extended_toy
         mlir/LowerToLLVM.cpp
         mlir/ShapeInferencePass.cpp
         mlir/TestPass.cpp
+        mlir/DebugPrintPass.cpp
         mlir/ToyCombine.cpp
 
         DEPENDS

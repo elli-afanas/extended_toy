@@ -1,7 +1,10 @@
-#pragma once
-
-#include "mlir/IR/BuiltinOps.h"
 #include "mlir/Pass/Pass.h"
+#include "toy/Dialect.h"
+#include "toy/Passes.h"
+#include "toy/ShapeInferenceInterface.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/Support/Debug.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace {
 /// This pass illustrates the IR nesting through printing.
