@@ -54,7 +54,7 @@ add_custom_target(Toy)
 macro(add_toy_deps name)
     add_dependencies(Toy ${name})
     add_llvm_example(${name} ${ARGN})
-endmacro(add_toy_chapter name)
+endmacro(add_toy_deps name)
 
 add_toy_deps(extended_toy
         toyc.cpp
@@ -64,6 +64,7 @@ add_toy_deps(extended_toy
         mlir/LowerToAffineLoops.cpp
         mlir/LowerToLLVM.cpp
         mlir/ShapeInferencePass.cpp
+        mlir/TestPass.cpp
         mlir/ToyCombine.cpp
 
         DEPENDS

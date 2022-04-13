@@ -21,6 +21,8 @@ class Pass;
 namespace toy {
 std::unique_ptr<Pass> createShapeInferencePass();
 
+std::unique_ptr<Pass> createTestPass();
+
 std::unique_ptr<Pass> createDebugPrintPass();
 
 /// Create a pass for lowering to operations in the `Affine` and `Std` dialects,

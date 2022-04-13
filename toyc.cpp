@@ -141,6 +141,9 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   bool isLoweringToAffine = emitAction >= Action::DumpMLIRAffine;
   bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
 
+  mlir::OpPassManager &myNestedPM = pm.nest<mlir::toy::MatAddOp>();
+  myNestedPM.addPass(mlir::toy::createTestPass());
+
   if (enableOpt || isLoweringToAffine) {
     //pm.addPass(mlir::toy::createDebugPrintPass());
 
