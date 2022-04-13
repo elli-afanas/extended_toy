@@ -374,15 +374,13 @@ def TransposeOp : Toy_Op<"transpose",
 
 def MatAddOp : Toy_Op<"mat_add", [NoSideEffect, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
   let summary = "mat_add operation";
-  let description = [{
-  well it adds two matricies (in tensor format). returns a matrix of the same size
-  }];
+  let description = [{ adds two matricies (in tensor format). returns a matrix of the same size }];
 
   let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
   let results = (outs F64Tensor);
 
   // Indicate that the operation has a custom parser and printer method.
-  //let hasCustomAssemblyFormat = 1;
+  // let hasCustomAssemblyFormat = 1;
   // this is instead of C++-defined custom parser and printer
   let assemblyFormat = [{
   `(` $lhs `:` type($lhs) $rhs `:` type($rhs) `)` attr-dict `to` type(results)
@@ -394,7 +392,6 @@ def MatAddOp : Toy_Op<"mat_add", [NoSideEffect, DeclareOpInterfaceMethods<ShapeI
   ];
 
   let hasCanonicalizer = 1;
-
   let hasVerifier = 1;
 }
 

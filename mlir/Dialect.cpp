@@ -432,13 +432,10 @@ void MatAddOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
 
 mlir::LogicalResult MatAddOp::verify()
 {
-  std::cout << "CALLED MatAddOp::verify()" << std::endl;
   auto lhsType = getLhs().getType().dyn_cast<RankedTensorType>();
   auto rhsType = getRhs().getType().dyn_cast<RankedTensorType>();
 
   auto resultType= getType().dyn_cast<RankedTensorType>();
-
-  std::cout << "shape of output: " << this->getType().hasStaticShape() << std::endl;
 
   if (!lhsType)
   {
@@ -454,12 +451,6 @@ mlir::LogicalResult MatAddOp::verify()
 
   auto lhsShape = lhsType.getShape();
   auto rhsShape = rhsType.getShape();
-
-  if(lhsShape.size() != 2 || rhsShape.size() != 2)
-  {
-    return emitError()
-        << "input tensors should be matricies (have dim = 2), while they are " << lhsShape.size() << " and " << rhsShape.size();
-  }
 
   if(lhsShape.size() != 2 || rhsShape.size() != 2)
   {
