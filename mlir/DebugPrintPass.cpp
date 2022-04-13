@@ -22,10 +22,18 @@ struct DebugPrintPass
     printOperation(op);
   }
 
+  DebugPrintPass() = default;
+  DebugPrintPass(const DebugPrintPass& pass) {};
+
+  Statistic opsStat{this, "opsVisited", "how many operations are visited"};
+  Statistic regionsStat{this, "regionsVisited", "how many regions are visited"};
+  Statistic blocksStat{this, "blocksVisited", "how many blocks are visited"};
+
   /// The three methods below are mutually recursive and follow the nesting of
   /// the IR: operation->region->block->operation->...
 
   void printOperation(mlir::Operation *op) {
+    opsStat++;
     // Print the operation itself and some of its properties
     printIndent() << "visiting op: '" << op->getName() << "' with "
                   << op->getNumOperands() << " operands and "
@@ -46,6 +54,7 @@ struct DebugPrintPass
   }
 
   void printRegion(mlir::Region &region) {
+    regionsStat++;
     // A region does not hold anything by itself other than a list of blocks.
     printIndent() << "Region with " << region.getBlocks().size()
                   << " blocks:\n";
@@ -55,6 +64,7 @@ struct DebugPrintPass
   }
 
   void printBlock(mlir::Block &block) {
+    blocksStat++;
     // Print the block intrinsics properties (basically: argument list)
     printIndent()
         << "Block with " << block.getNumArguments() << " arguments, "
@@ -87,7 +97,37 @@ struct DebugPrintPass
 };
 } // namespace
 
-
 std::unique_ptr<mlir::Pass> mlir::toy::createDebugPrintPass() {
   return std::make_unique<DebugPrintPass>();
 }
+
+/*
+struct DebugPrintPass
+    : public mlir::PassWrapper<DebugPrintPass, mlir::OperationPass<>> {
+
+  // Entry point for the pass.
+  void runOnOperation() override {
+    mlir::Operation *op = getOperation();
+    printOperation(op);
+  }
+
+  void printOperation(mlir::Operation *op) {
+    // ... Print the operation itself and some of its properties (operands and arguments)
+    for (mlir::Region &region : op->getRegions())
+      printRegion(region);
+  }
+
+  void printRegion(mlir::Region &region) {
+    // ... Print the block intrinsics properties (basically: argument list)
+    for (mlir::Block &block : region.getBlocks())
+      printBlock(block);
+  }
+
+  void printBlock(mlir::Block &block) {
+    // ... Print the block intrinsics properties (basically: argument list)
+    for (mlir::Operation &op : block.getOperations())
+      printOperation(&op);
+  }
+
+};
+*/
