@@ -146,7 +146,12 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   // printing nested structure pass. here everything is not inlined
   // pm.addPass(mlir::toy::createDebugPrintPass());
 
-  //pm.addNestedPass<mlir::toy::MatAddOp>(mlir::toy::createTestPass());
+  // Nest a pass manager that operates on functions (e.g. main) within the nested Toy module.
+  mlir::OpPassManager &nestedFuncPM = pm.nest<mlir::toy::FuncOp>();
+
+  // Nest a pass manager that operates on all MatAdd operations inside any function
+  mlir::OpPassManager &nestedMatAddPM = nestedFuncPM.nest<mlir::toy::MatAddOp>();
+  nestedMatAddPM.addPass(mlir::toy::createTestPass());
 
   if (enableOpt || isLoweringToAffine) {
     // Inline all functions into main and then delete them.
@@ -164,6 +169,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
 
     //mlir::OpPassManager &myNestedPM = pm.nest<mlir::toy::MatAddOp>();
     //myNestedPM.addPass(mlir::toy::createTestPass());
+
+    //pm.addNestedPass<mlir::toy::MatAddOp>(mlir::toy::createTestPass());
   }
 
   if (isLoweringToAffine) {

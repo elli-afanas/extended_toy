@@ -1,5 +1,6 @@
+
 def multiply_transpose(a, b) {
-  return transpose(a) * transpose(b);
+  return mat_add(a, b);
 }
 
 def main() {

@@ -439,13 +439,13 @@ mlir::LogicalResult MatAddOp::verify()
 
   if (!lhsType)
   {
-    std::cout << "empty lhs type in matAdd" << std::endl;
+    //std::cout << "empty lhs type in matAdd" << std::endl;
     return mlir::success();
   }
 
   if (!rhsType)
   {
-    std::cout << "empty rhs type in matAdd" << std::endl;
+    //std::cout << "empty rhs type in matAdd" << std::endl;
     return mlir::success();
   }
 

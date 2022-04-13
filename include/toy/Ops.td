@@ -372,7 +372,7 @@ def TransposeOp : Toy_Op<"transpose",
 // MatAddOp
 //===----------------------------------------------------------------------===//
 
-def MatAddOp : Toy_Op<"mat_add", [NoSideEffect, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
+def MatAddOp : Toy_Op<"mat_add", [NoSideEffect, IsolatedFromAbove, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
   let summary = "mat_add operation";
   let description = [{ adds two matricies (in tensor format). returns a matrix of the same size }];
 
